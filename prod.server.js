@@ -1,7 +1,19 @@
 const express = require('express')
+const path = require('path')
 const axios = require('axios')
+const compression = require('compression')
 const app = express()
 const apiRoutes = express.Router()
+
+app.use(compression({ filter: shouldCompression }))
+
+function shouldCompression(req, res) {
+  if (req.headers['x-no-compression']) {
+    return false
+  }
+
+  return compression.filter(req, res)
+}
 
 apiRoutes.get('/getLyric', (req, res) => {
   let url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg'
@@ -81,12 +93,20 @@ apiRoutes.get('/getDisclist', (req, res) => {
 })
 
 app.use('/api', apiRoutes)
-app.use(express.static('./dist'))
+app.use(express.static(path.resolve(__dirname, './dist')))
 
-module.exports = app.listen(8088, function (err) {
+app.get('*', (req, res) => {
+  const html = fs.readFileSync(path.resolve(__dirname, './dist'))
+
+  // res.writeHead(200, { 'Content-Type': 'text/html;charset=utf-8' })
+  res.end(html)
+})
+
+
+app.listen(8088, function (err) {
   if (err) {
     console.log(err)
     return
   }
-  console.log('application is running at htttp://47.93.220.228:8088/')
+  console.log('application is running at 8088')
 })
