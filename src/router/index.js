@@ -60,6 +60,7 @@ const UserCenter = (resolve) => {
 Vue.use(Router)
 
 export default new Router({
+  base: '/music',
   routes: [
     {
       path: '/',
