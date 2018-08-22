@@ -5,7 +5,7 @@
             </slot>
         </div>
         <div class="dots">
-            <div class="dot" v-for="(item,index) in dots" :key="index" :class="{active: currentPageIndex === index}"></div>
+            <div class="dot" v-for="(item, index) in dots" :key="index" :class="{active: currentPageIndex === index}"></div>
         </div>
     </div>
 </template>
@@ -52,7 +52,7 @@ export default{
         }, 20)
 
         window.addEventListener('resize', () => {
-            if (!this.slider) {
+            if (!this.slider || !this.scroll.enabled) {
                 return
             }
 
@@ -76,7 +76,7 @@ export default{
                 width += sliderWidth
             }
 
-            if (this.loop && !isResize) {
+            if (this.loop) {
                 width += 2 * sliderWidth
             }
 
@@ -105,27 +105,42 @@ export default{
                 let pageIndex = this.slider.getCurrentPage().pageX
 
                 this.currentPageIndex = pageIndex
-
                 if (this.autoPlay) {
-                    clearTimeout(this.timer)
-                    this._play()
+                  this._play()
                 }
+            })
+
+            this.slider.on('beforeScrollStart', () => {
+              if (this.autoPlay) {
+                clearTimeout(this.timer)
+              }
             })
         },
 
         // 自动播放
         _play() {
-            let pageIndex = this.currentPageIndex + 1
-            if (pageIndex === this.dots.length) {
-                pageIndex = 0
-            }
-            this.timer = setTimeout(() => {
-                this.slider.goToPage(pageIndex, 0, 400)
-            }, this.interval)
+          clearTimeout(this.timer)
+          this.timer = setTimeout(() => {
+              this.slider.next()
+          }, this.interval)
         }
     },
-    destroyed() {
+    activated() {
+        this.slider.enable()
+        let pageIndex = this.slider.getCurrentPage().pageX
+        this.slider.goToPage(pageIndex, 0, 0)
+        this.currentPageIndex = pageIndex
+        if (this.autoPlay) {
+            this._play()
+        }
+    },
+    deactivated() {
+        this.slider.disable()
         clearTimeout(this.timer)
+    },
+    destroyed() {
+      this.slider.disable()
+      clearTimeout(this.timer)
     }
 }
 </script>
