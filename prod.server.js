@@ -1,5 +1,6 @@
 const express = require('express')
 const path = require('path')
+const fs = require('fs')
 const axios = require('axios')
 const compression = require('compression')
 const app = express()
