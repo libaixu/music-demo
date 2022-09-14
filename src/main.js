@@ -14,7 +14,7 @@ fastclick.attach(document.body)
 Vue.use(VueLazyLoad, {
   loading: require('common/image/default.png')
 })
-
+// 拉萨可见度分厘卡撒酒疯流口水fd'
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
